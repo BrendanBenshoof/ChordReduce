@@ -1,6 +1,6 @@
 import service
 import message
-import node
+import voronoinode as node
 import hash_util
 import shelver
 import base64

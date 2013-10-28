@@ -2,15 +2,11 @@
 ###Startup and commandline file
 import service
 import shelver as db 
-import Topology_Service
-import httpservice
 import hash_util
 import random
 import simple_network
-import node
+import voronoinode as node
 import time
-import filesystem_service
-import map_reduce
 import Queue
 import os
 
@@ -69,9 +65,6 @@ def setup_Node(addr="localhost", port=None):
     add_service(database)
     add_service(service.Internal_Service())
     add_service(service.ECHO_service())
-    add_service(Topology_Service.Topology())
-    add_service(filesystem_service.FileSystem())
-    add_service(map_reduce.Map_Reduce_Service())
     #add_service(httpservice.WEBSERVICE(database))
     
     ####
@@ -127,8 +120,7 @@ def console():
         elif command == "num_threads":
             print threading.activeCount()
         else:
-            print "successor  ", node.successor
-            print "predecessor", node.predecessor
+            print "peers", map(str,node.peers)
         try:
             if loaded_script.empty():
                 cmd = raw_input()
@@ -151,7 +143,7 @@ def main():
         local_port = int(args[1]) 
     else: 
         local_port = random.randint(9000, 9999)
-        
+    print myip+":"+str(local_port)
     other_IP = args[2] if len(args) > 2 else None
     other_port = int(args[3]) if len(args) > 3 else None
 

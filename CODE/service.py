@@ -1,7 +1,7 @@
 from message import *
 from hash_util import *
 from Queue import Queue
-import node
+import voronoinode as node
 import os
 import time
 from globals import *
@@ -60,7 +60,7 @@ class ECHO_service(Service):
             raise Exception("Mismatched service recipient for message.")
 
         for k in msg.contents.keys():
-            print msg.get_content(k)
+            print k+":"+str(msg.get_content(k))
 
 
 
@@ -83,24 +83,12 @@ class Internal_Service(Service):
         msgtype = msg.type
         response = None
         if node.TEST_MODE:
-            if msg.origin_node != node.thisNode:
-                pass
-                #print "Got " + str(msgtype) +  " from " + str(msg.origin_node)
+            print "Got " + str(msgtype) +  " from " + str(msg.origin_node)
         if msgtype == FIND:  # This might not ever happen with new changes
             response = Update_Message(self.owner, msg.reply_to.key, msg.finger)
-        elif msgtype == UPDATE:
-            node.update_finger(msg.reply_to, msg.finger)
         elif msgtype == STABILIZE:
-            response = Stablize_Reply_Message(self.owner, msg.reply_to.key, node.predecessor)
-        elif msgtype == STABILIZE_REPLY:
             node.stabilize(msg)
-        elif msgtype == NOTIFY:
-            node.get_notified(msg)
-        elif msgtype == CHECK_PREDECESSOR:
-            response = Update_Message(self.owner, msg.reply_to.key, 0)
-        elif msgtype == POLITE_QUIT:
-            node.peer_polite_exit(msg.reply_to)
-
+ 
         else:
             return False
         if response != None:
@@ -134,5 +122,6 @@ class Internal_Service(Service):
             nodeip = args[0]
             nodePort = int(args[1])
             newnode = node.Node_Info(nodeip, nodePort)
-            find = Find_Successor_Message(self.owner, self.owner.key, self.owner)
-            self.send_message(find, newnode)
+            message = Stablize_Message(self.owner,newnode)###UPDATE
+            message.add_content("peers",[self.owner]+node.peers)
+            self.send_message(message, newnode)

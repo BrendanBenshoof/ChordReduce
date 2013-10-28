@@ -2,7 +2,7 @@
 from SocketServer import *
 import threading
 import socket
-import node
+import voronoinode as node
 import message
 from Queue import *
 import time

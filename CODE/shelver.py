@@ -4,7 +4,7 @@ import threading
 import time
 import hash_util
 import shelve
-import node
+import voronoinode as node
 from message import Message
 from globals import *
 
