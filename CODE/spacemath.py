@@ -15,8 +15,8 @@ def distance(p0, p1):
     
 
 def midpoint(p0, p1):
-    deltas = map( lambda x,y: min([(x-y),size-(x-y)]), p0, p1)
-    return map(lambda x,y: x+y, p0, deltas)
+    deltas = map( lambda y,x: min([(x-y)%size,(size-(x-y))%size], key=math.fabs), p0, p1)
+    return map(lambda x,y: x+y*0.5, p0, deltas)
 
 
 def v_filter(p0, peers):

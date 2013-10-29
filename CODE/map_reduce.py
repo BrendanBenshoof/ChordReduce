@@ -2,7 +2,7 @@ from service import *
 from message import *
 from hash_util import *
 import Queue
-import node
+import voronoinode as node
 from threading import Thread
 import time
 import importlib
@@ -82,7 +82,8 @@ class Map_Reduce_Service(Service):
                 print "sent a backup map"
             elif msg.type==MAP:
                 msg.backup = True
-                self.send_message(msg,node.successor)
+                for n in node.peers:
+                    self.send_message(msg,n)
                 job_todo.put(msg)
             else:
                 job_todo.put(msg)

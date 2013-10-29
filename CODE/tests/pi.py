@@ -43,7 +43,7 @@ def reduce_func(atom1, atom2):
 
 
 def stage():
-    samples = 100000000 #midsize run
+    samples = 10000 #midsize run
     jobs = 500
     atoms = []
     last = 0

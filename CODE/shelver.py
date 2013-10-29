@@ -140,29 +140,39 @@ class Shelver(Service):
         records = shelve.open(self.db)
         for k in records.keys():
             k_key = hash_util.Key(k)
-            if not hash_util.hash_between_right_inclusive(k_key,self.own_start, self.own_end):
+            if not node.I_own_hash(k_key):
                 backup[k] = records[k]
-        size = len(backup.keys())
-        if size > 0:
-            newmsg = Database_Backup_Message(self.owner, backup)
-            self.send_message(newmsg,node.predecessor)
+        msgbuckets = {}
+        for k in backup.keys():
+            k_key = hash_util.Key(k)
+            best_foward = node.find_ideal_forward(k_key)
+            if best_foward in msgbuckets.keys():
+                msgbuckets[best_foward][k] = backup[k]
+            else:
+                msgbuckets[best_foward] = {}
+                msgbuckets[best_foward][k] = backup[k]
+        for n in msgbuckets.keys():
+            if n != self.owner:
+                newmsg = Database_Backup_Message(self.owner, msgbuckets[n])
+                self.send_message(newmsg,n)
         records.close()
         self.write_lock.release()
     
     def periodic_backup(self):
-        time.sleep(60)
-        if not self.own_start is None:
-            backup = {}
-            self.write_lock.acquire()
-            records = shelve.open(self.db)
-            for k in records.keys():
-                k_key = hash_util.Key(k)
-                if hash_util.hash_between_right_inclusive(k_key,self.own_start, self.own_end):
-                    backup[k] = records[k]
-            size = len(backup.keys())
-            if size > 0:
+        time.sleep(10)
+        backup = {}
+        self.write_lock.acquire()
+        records = shelve.open(self.db)
+        for k in records.keys():
+            k_key = hash_util.Key(k)
+            if node.I_own_hash(k_key):
+                backup[k] = records[k]
+        size = len(backup.keys())
+        if size > 0:
+            for n in node.peers:
                 newmsg = Database_Backup_Message(self.owner, backup)
-                self.send_message(newmsg,node.predecessor)
-            records.close()
-            self.write_lock.release()
+                newmsg.destination_key = n.key
+                self.send_message(newmsg,n)
+        records.close()
+        self.write_lock.release()
           

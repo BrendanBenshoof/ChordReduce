@@ -9,10 +9,10 @@ import voronoinode as node
 import time
 import Queue
 import os
-
+import filesystem_service
 import threading 
 import sys
-
+import map_reduce
 
 
 import json
@@ -65,6 +65,8 @@ def setup_Node(addr="localhost", port=None):
     add_service(database)
     add_service(service.Internal_Service())
     add_service(service.ECHO_service())
+    add_service(filesystem_service.FileSystem())
+    add_service(map_reduce.Map_Reduce_Service())
     #add_service(httpservice.WEBSERVICE(database))
     
     ####
