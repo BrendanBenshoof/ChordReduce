@@ -17,7 +17,7 @@ FAILURE = "FAILURE"
 SERVICE_RELOAD = "RELOAD"
 
 class Message(object):
-    def __init__(self, service, type, success_callback_msg = None, failed_callback_msg = None):
+    def __init__(self, service, type):
         self.origin_node = None     # One hop origin
         self.destination_key = generate_random_key()    # 160 number or hash object
         self.reply_to = None        # Node to reply to
